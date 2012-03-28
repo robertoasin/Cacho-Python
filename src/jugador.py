@@ -6,7 +6,8 @@ class Jugador:
         self.nombre   = nom
         self.intento  = 0
         self.turno    = 0
-        print "Jugador "+self.nombre+" se ha creado"
+        self.lanzamiento = 0
+        #print "Jugador "+self.nombre+" se ha creado"
 
     def setNuevoTurno(self):
         #print "nuevo turno para jugador "+self.nombre
@@ -16,6 +17,14 @@ class Jugador:
     def setNuevoIntento(self):
         #print "nuevo intento para jugador "+self.nombre
         self.intento+=1
+        self.lanzamiento = 0
+
+    def setNuevoLanzamiento(self):
+        #print "nuevo intento para jugador "+self.nombre
+        self.lanzamiento+=1
+
+    def setSeRespeta(self):
+        self.lanzamiento-=1
 
     def jugar(self,marcadores,actuacionesPosibles,dados,resultadoPrevio):
         #print "turno = "+str(self.turno)

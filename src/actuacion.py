@@ -20,3 +20,6 @@ class Actuacion:
             print "["+str(indice)+"]"+"("+self.accion+","+str(self.anotacion)+","+str(self.indiceDados)+","+str(self.seRespeta)+")"
         else:
             print "("+self.accion+","+str(self.anotacion)+","+str(self.indiceDados)+","+str(self.seRespeta)+")"
+
+    def imprimirEnArchivo(self,archivo):
+        archivo.write("("+self.accion+","+str(self.anotacion)+","+str(self.indiceDados)+","+str(self.seRespeta)+")\n")

@@ -1,0 +1,12 @@
+These are the sources of the (pedagogical) framework Cacho-Python.
+Cacho-Python is the implementation of the bolivian popular game "Cacho" (Alalay version). 
+The aim of this implementations is to provide a framework for the development of Cacho-bots and to constitute the base for a yearly Cacho-contest
+
+These sources are under the GNU General Public License Version 3.  See
+COPYING for more details and a copy of the license.
+
+Cacho-Python is copyright (c) 2012 by Roberto Asín Achá,
+Department of Computer Science, Universidad Católica de la Santísima
+Concepción, Concepción, Chile <rasin@ucsc.cl>.
+
+2012-03-28-13:03

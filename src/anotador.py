@@ -2,19 +2,31 @@ import random
 from actuacion import *
 from jugadorHumano import *
 from jugadorHumano2 import *
+from jugadorBase import *
+from jugadorBase2 import *
+from jugadorBase3 import *
+from jugadorAleatorio import *
+from jugadorAleatorio2 import *
 
 class Anotador:
     """ Abstraccion del anotador del juego """
-    def __init__(self, listaJugadores):
+    def __init__(self, listaJugadores, modoCompeticion = False):
+        self.modoCompeticion = modoCompeticion
         self.listaJugadores = listaJugadores
         self.juegosPosibles = ["balas","tontos","trenes","cuadras","quinas","senas","escalera","full","poker","grande", "grande2"]
         self.jugadores      = {} #hash de jugadores
         self.marcadores     = {} #hash de marcadores
+        filename = "log"
         for jugador in listaJugadores:
+            filename=filename+"-"+jugador
             self.jugadores.update({jugador : eval(jugador+"()")})
             self.marcadores.update({jugador : Marcador()})
+        self.log = open(filename,"at")
 
-        print self.jugadores
+        if not modoCompeticion:
+            print "nuevo juego entre jugadores: "+listaJugadores
+        else:
+            self.log.write("\n\nnuevo juego entre jugadores: "+str(listaJugadores)+"\n\n")
             
     def generarTodoLanzamientoPosible(self):
         lista=[]
@@ -432,33 +444,50 @@ class Anotador:
             suma+=repr(self.marcadores[nombreJugador].suma).rjust(30)
             dormida+=repr(self.marcadores[nombreJugador].dormida).rjust(30)
             #self.marcadores[nombreJugador].display()
-        print nombres
-        print balas
-        print tontos
-        print trenes
-        print cuadras
-        print quinas
-        print senas
-        print escalera
-        print full
-        print poker
-        print grande
-        print grande2
-        print suma
-        print dormida
 
-    def calcularActuaciones(self,jugador,turno,intento,indiceDados,dados,resultadoPrevio,yaAnotado):
+        if not self.modoCompeticion:
+            print nombres  
+            print balas    
+            print tontos   
+            print trenes   
+            print cuadras  
+            print quinas   
+            print senas    
+            print escalera 
+            print full     
+            print poker    
+            print grande   
+            print grande2  
+            print suma     
+            print dormida  
+        else:
+            self.log.write(nombres+"\n")
+            self.log.write(balas+"\n")
+            self.log.write(tontos+"\n")
+            self.log.write(trenes+"\n")
+            self.log.write(cuadras+"\n")
+            self.log.write(quinas+"\n")
+            self.log.write(senas+"\n")
+            self.log.write(escalera+"\n")
+            self.log.write(full+"\n")
+            self.log.write(poker+"\n")
+            self.log.write(grande+"\n")
+            self.log.write(grande2+"\n")
+            self.log.write(suma+"\n")
+            self.log.write(dormida+"\n")
+
+    def calcularActuaciones(self,jugador,turno,lanzamiento,indiceDados,dados,resultadoPrevio,yaAnotado):
         actuacionesPosibles=[]
 
-        if intento==1:
+        if lanzamiento==1:
             assert(len(indiceDados)==5)
             actuacionesPosibles+=self.generarTodoLanzamientoPosible()
-            actuacionesPosibles+=self.verificarJugadasDeMano(jugador,dados,turno==1, intento==1)  #aqui podria agregarse realizar lanzamientos de dados porque se respeta
+            actuacionesPosibles+=self.verificarJugadasDeMano(jugador,dados,turno==1, lanzamiento==1)  #aqui podria agregarse realizar lanzamientos de dados porque se respeta
         else:
-            assert(intento==2)
+            assert(lanzamiento==2)
             #actuacionesPosibles+=self.agregarBorres()
             if len(indiceDados)==5:
-                actuacionesPosibles+=self.verificarJugadasDeMano(jugador,dados,turno==1, intento==1)
+                actuacionesPosibles+=self.verificarJugadasDeMano(jugador,dados,turno==1, lanzamiento==1)
             actuacionesPosibles+=self.verificarJugadasConVuelque(jugador,dados,turno==1)
             if turno==2:
                 if yaAnotado:
@@ -471,7 +500,13 @@ class Anotador:
         return actuacionesPosibles
 
     def ejecutarTurno(self,nombreJugador,jugador):
-        print "nuevo turno para jugador: "+nombreJugador
+        self.imprimirResultado()
+
+        if self.modoCompeticion:
+            self.log.write("nuevo turno para jugador: "+nombreJugador+"\n")
+        else:
+            print "nuevo turno para jugador: "+nombreJugador
+
         jugador.setNuevoTurno()
         dados=[0,0,0,0,0]
         indiceDados=[0,1,2,3,4]
@@ -479,16 +514,24 @@ class Anotador:
         yaAnotado=False
         import copy
 
+        jugador.setNuevoIntento()
+        if self.modoCompeticion:
+            self.log.write("Intento: 1\n")
+
         lanzar=True
-        intento=0
+        lanzamiento=0
         while lanzar:
-            intento+=1
-            print "intento: "+str(intento)
-            jugador.setNuevoIntento()
+            lanzamiento+=1
+            jugador.setNuevoLanzamiento()
             assert(len(indiceDados)>0)
             dados  = self.lanzarDados(indiceDados,dados)
-            self.imprimirResultado()
-            actuacionesPosibles = self.calcularActuaciones(nombreJugador,1,intento,indiceDados,dados,resultadoPrevio,yaAnotado)
+            if self.modoCompeticion:
+                self.log.write("Lanzamiento: "+str(lanzamiento)+"\n")
+                self.log.write("tiene dados: "+str(dados)+"\n")
+            else:
+                print "lanzamiento: "+str(lanzamiento)
+
+            actuacionesPosibles = self.calcularActuaciones(nombreJugador,1,lanzamiento,indiceDados,dados,resultadoPrevio,yaAnotado)
             assert(len(actuacionesPosibles)>0)
             copiaDados = copy.deepcopy(dados)
             copiaActuaciones = copy.deepcopy(actuacionesPosibles)
@@ -497,6 +540,9 @@ class Anotador:
             indiceActuacion = jugador.jugar(copiaMarcadores,copiaActuaciones,copiaDados,copiaResultadoPrevio)
             assert(indiceActuacion<len(actuacionesPosibles))
             actuacion = actuacionesPosibles[indiceActuacion]
+            if self.modoCompeticion:
+                self.log.write("Escoge: ")
+                actuacion.imprimirEnArchivo(self.log)
             #print "actuacion seleccionada: "
             #actuacion.display()
 
@@ -504,7 +550,8 @@ class Anotador:
             if lanzar:
                 indiceDados=actuacion.indiceDados
                 if actuacion.seRespeta:
-                    intento-=1
+                    jugador.setSeRespeta()
+                    lanzamiento-=1
 
         if actuacion.accion == "dormida":
             self.anotar(nombreJugador,actuacion)
@@ -518,29 +565,36 @@ class Anotador:
             assert(actuacion.accion == "sobre")
             resultadoPrevio = actuacion.anotacion
 
-        #print "Fin Turno"
 
-        if  not self.marcadores[nombreJugador].marcadorIncompleto():
+        if  (not self.marcadores[nombreJugador].marcadorIncompleto()) or self.marcadores[nombreJugador].tieneAlalay():
             return self.marcadores[nombreJugador].tieneAlalay()
 
-        jugador.setNuevoTurno()
+        jugador.setNuevoIntento()
+        if self.modoCompeticion:
+            self.log.write("Intento: 2\n")
         indiceDados=[0,1,2,3,4]
         lanzar=True
-        intento=0
+        lanzamiento=0
         while lanzar:
-            intento+=1
-            jugador.setNuevoIntento()
+            lanzamiento+=1
+            jugador.setNuevoLanzamiento()
             dados  = self.lanzarDados(indiceDados,dados)
-            actuacionesPosibles = self.calcularActuaciones(nombreJugador,2,intento,indiceDados,dados,resultadoPrevio,yaAnotado)
+            if self.modoCompeticion:
+                self.log.write("Lanzamiento: "+str(lanzamiento)+"\n")
+                self.log.write("tiene dados: "+str(dados)+"\n")
+            actuacionesPosibles = self.calcularActuaciones(nombreJugador,2,lanzamiento,indiceDados,dados,resultadoPrevio,yaAnotado)
             assert(len(actuacionesPosibles)>0)
             copiaDados = copy.deepcopy(dados)
             copiaActuaciones = copy.deepcopy(actuacionesPosibles)
             copiaMarcadores = copy.deepcopy(self.marcadores)
             copiaResultadoPrevio = copy.deepcopy(resultadoPrevio)
-            self.imprimirResultado()
+#            self.imprimirResultado()
             indiceActuacion = jugador.jugar(copiaMarcadores,copiaActuaciones,copiaDados,copiaResultadoPrevio)
             assert(indiceActuacion<len(actuacionesPosibles))
             actuacion = actuacionesPosibles[indiceActuacion]
+            if self.modoCompeticion:
+                self.log.write("Escoge: ")
+                actuacion.imprimirEnArchivo(self.log)
             #print "actuacion seleccionada: "
             #actuacion.display()
 
@@ -548,7 +602,8 @@ class Anotador:
             if lanzar:
                 indiceDados=actuacion.indiceDados
                 if actuacion.seRespeta:
-                    intento-=1
+                    jugador.setSeRespeta()
+                    lanzamiento-=1
 
         if actuacion.accion == "dormida":
             self.anotar(nombreJugador,actuacion)
@@ -567,15 +622,34 @@ class Anotador:
         marcadoresIncompletos = len(self.listaJugadores)
         alalayODormida=False
 
+        ganadores=[]
+
         while marcadoresIncompletos!=0 and not alalayODormida:
             marcadoresIncompletos=len(self.listaJugadores)
             for nombreJugador in self.listaJugadores:
                 if self.marcadores[nombreJugador].marcadorIncompleto():
                     alalayODormida = self.ejecutarTurno(nombreJugador,self.jugadores[nombreJugador])
+                    if(alalayODormida):
+                        ganadores.append(nombreJugador)
                 else:
                     marcadoresIncompletos-=1
 
         self.imprimirResultado()
+        if not alalayODormida:
+            puntajeMayor=0
+            for nombreJugador in self.listaJugadores:
+                if self.marcadores[nombreJugador].suma > puntajeMayor:
+                    puntajeMayor = self.marcadores[nombreJugador].suma
+
+            for nombreJugador in self.listaJugadores:
+                if self.marcadores[nombreJugador].suma == puntajeMayor:
+                    ganadores.append(nombreJugador)
+
+        return ganadores
+
+
+
+            
                     
             
     
