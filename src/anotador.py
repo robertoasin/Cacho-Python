@@ -5,8 +5,8 @@ from jugadorHumano2 import *
 from jugadorBase import *
 from jugadorBase2 import *
 from jugadorBase3 import *
+from jugadorBase4 import *
 from jugadorAleatorio import *
-from jugadorAleatorio2 import *
 
 class Anotador:
     """ Abstraccion del anotador del juego """
@@ -27,6 +27,8 @@ class Anotador:
             print "nuevo juego entre jugadores: "+listaJugadores
         else:
             self.log.write("\n\nnuevo juego entre jugadores: "+str(listaJugadores)+"\n\n")
+
+        random.seed()
             
     def generarTodoLanzamientoPosible(self):
         lista=[]
