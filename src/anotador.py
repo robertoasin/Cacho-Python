@@ -7,7 +7,7 @@ from jugadorBase2 import *
 from jugadorBase3 import *
 from jugadorBase4 import *
 from jugadorAleatorio import *
-
+#from moebious import *
 class Anotador:
     """ Abstraccion del anotador del juego """
     def __init__(self, listaJugadores, modoCompeticion = False):
@@ -24,7 +24,7 @@ class Anotador:
         self.log = open(filename,"at")
 
         if not modoCompeticion:
-            print "nuevo juego entre jugadores: "+listaJugadores
+            print "nuevo juego entre jugadores: "+str(listaJugadores)
         else:
             self.log.write("\n\nnuevo juego entre jugadores: "+str(listaJugadores)+"\n\n")
 
@@ -633,6 +633,7 @@ class Anotador:
                     alalayODormida = self.ejecutarTurno(nombreJugador,self.jugadores[nombreJugador])
                     if(alalayODormida):
                         ganadores.append(nombreJugador)
+                        break
                 else:
                     marcadoresIncompletos-=1
 
@@ -646,6 +647,12 @@ class Anotador:
             for nombreJugador in self.listaJugadores:
                 if self.marcadores[nombreJugador].suma == puntajeMayor:
                     ganadores.append(nombreJugador)
+
+        sumaGanador = self.marcadores[ganadores[0]].suma
+        for i in range(len(ganadores)):
+            if(len(ganadores)>1):
+                assert(self.marcadores[ganadores[i]].dormida==False and self.marcadores[ganadores[i]].panzaDeOro==False)
+                assert(self.marcadores[ganadores[i]].suma == sumaGanador)
 
         return ganadores
 
