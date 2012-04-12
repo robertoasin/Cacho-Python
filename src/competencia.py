@@ -13,7 +13,8 @@ print "Iniciando competencia"
 hashJugadores = {"JugadorAleatorio":0,
                  "JugadorBase":0,
                  "JugadorBase4":0,
-                 "JugadorBase2":0}
+#                 "JugadorBase2":0}
+                 "Moebious":0}
 numRepeticiones = 500
 
 listaJugadores = hashJugadores.keys()
@@ -23,8 +24,9 @@ for i in range(0,len(listaJugadores)):
             for l in range(numRepeticiones):
                 #time.sleep(1)
                 juego = Anotador([listaJugadores[i],listaJugadores[j],listaJugadores[k]],True)
-                ganadores = juego.hacerJugar()
-                for ganador in ganadores:
+                ganadoresJuego = []
+                ganadoresJuego = juego.hacerJugar()
+                for ganador in ganadoresJuego:
                     hashJugadores[ganador]+=1
                     os.system("clear")
                     print "\nActualmente en Juego: "+"("+str(l+1)+"/"+str(numRepeticiones)+"): "+listaJugadores[i]+" "+listaJugadores[j]+" "+listaJugadores[k]+"\n"
