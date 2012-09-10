@@ -7,7 +7,7 @@ from jugadorBase2 import *
 from jugadorBase3 import *
 from jugadorBase4 import *
 from jugadorAleatorio import *
-from moebious import *
+# from moebious import *
 class Anotador:
     """ Abstraccion del anotador del juego """
     def __init__(self, listaJugadores, modoCompeticion = False):
